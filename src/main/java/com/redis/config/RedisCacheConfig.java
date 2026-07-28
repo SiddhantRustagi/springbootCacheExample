@@ -11,6 +11,9 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisCacheConfig {
@@ -27,7 +30,18 @@ public class RedisCacheConfig {
     @Value("${redis.shards[1].port}")
     private Integer shard1Port;
 
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(
+            @Qualifier("shard0ConnectionFactory") LettuceConnectionFactory cf) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(cf);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
+    }
+
     @Bean("shard0ConnectionFactory")
+    @Primary
     public LettuceConnectionFactory shard0ConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(shard0Host, shard0Port);
         return new LettuceConnectionFactory(config);

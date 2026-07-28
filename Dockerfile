@@ -12,7 +12,7 @@ RUN mvn package -DskipTests -B
 
 
 # Use an official OpenJDK as a base image
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre
 
 # Set the working directory inside the container
 WORKDIR /app
