@@ -13,6 +13,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -57,7 +58,10 @@ public class RedisCacheConfig {
     @Primary
     public RedisCacheManager shard0CacheManager(@Qualifier("shard0ConnectionFactory") LettuceConnectionFactory cf) {
         RedisCacheConfiguration defaults = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10));
+                .entryTtl(Duration.ofMinutes(10))
+                .serializeValuesWith(SerializationPair
+                        .fromSerializer(
+                                new GenericJackson2JsonRedisSerializer()));
         return RedisCacheManager.builder(cf)
                 .cacheDefaults(defaults)
                 .build();
@@ -66,7 +70,10 @@ public class RedisCacheConfig {
     @Bean("shard1CacheManager")
     public RedisCacheManager shard1CacheManager(@Qualifier("shard1ConnectionFactory") LettuceConnectionFactory cf) {
         RedisCacheConfiguration defaults = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10));
+                .entryTtl(Duration.ofMinutes(10))
+                .serializeValuesWith(SerializationPair
+                        .fromSerializer(
+                                new GenericJackson2JsonRedisSerializer()));
         return RedisCacheManager.builder(cf)
                 .cacheDefaults(defaults)
                 .build();
